@@ -5,7 +5,7 @@ import DateRangePicker from '@/components/custom/DateRangePicker';
 import BulkScheduling from '@/components/custom/BulkScheduling';
 import JSONOutput from '@/components/custom/JSONOutput';
 import PerformanceSummary from '@/components/custom/PerformanceSummary';
-import AddIndividualShows from '@/components/custom/AddIndividualShows';
+// import AddIndividualShows from '@/components/custom/AddIndividualShows';
 
 export default function PerformanceCalendar() {
   const [selectedDate, setSelectedDate] = useState();
@@ -19,7 +19,6 @@ export default function PerformanceCalendar() {
 
   // Sort performances by date, then by time
   const sortedPerformances = performances.sort((a, b) => {
-    // First compare dates
     const dateComparison = a.date.localeCompare(b.date);
     if (dateComparison !== 0) {
       return dateComparison;
@@ -158,7 +157,7 @@ export default function PerformanceCalendar() {
 
       <BulkScheduling scheduleByPattern={scheduleByPattern} clearPerformancesInRange={clearPerformancesInRange} setPerformances={setPerformances} dateRange={dateRange} />
 
-      <AddIndividualShows addPerformance={addPerformance} removePerformance={removePerformance} getPerformancesForDate={getPerformancesForDate} selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
+      {/* <AddIndividualShows addPerformance={addPerformance} removePerformance={removePerformance} getPerformancesForDate={getPerformancesForDate} selectedDate={selectedDate} setSelectedDate={setSelectedDate} /> */}
 
       <PerformanceSummary sortedFilteredPerformances={sortedFilteredPerformances} />
 

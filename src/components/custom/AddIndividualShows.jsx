@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '../ui/button'
 import { Calendar } from '../ui/calendar'
+import { format } from 'date-fns';
 
 export default function AddIndividualShows({addPerformance, removePerformance, getPerformancesForDate, selectedDate, setSelectedDate}) {
   return (
