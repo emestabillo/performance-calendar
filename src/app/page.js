@@ -1,103 +1,334 @@
-import Image from "next/image";
+'use client';
+import { useState } from 'react';
+import { Calendar } from '@/components/ui/calendar';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { format, isWithinInterval, parseISO, eachDayOfInterval, isSunday, isMonday, isTuesday, isWednesday, isThursday, isFriday, isSaturday } from 'date-fns';
 
-export default function Home() {
+export default function PerformanceCalendar() {
+  const [selectedDate, setSelectedDate] = useState();
+  const [performances, setPerformances] = useState([]);
+  const [dateRange, setDateRange] = useState({
+    from: undefined,
+    to: undefined,
+  });
+
+  const showtimes = ['2:00', '3:00', '7:00', '7:30', '8:00'];
+
+  // Bulk scheduling patterns
+  const schedulingPatterns = [
+    { label: 'Sundays at 3pm', day: 'sunday', time: '3:00' },
+    { label: 'Tuesdays at 7pm', day: 'tuesday', time: '7:00' },
+    { label: 'Wednesdays at 2pm', day: 'wednesday', time: '2:00' },
+    { label: 'Wednesdays at 7:30pm', day: 'wednesday', time: '7:30' },
+    { label: 'Thursdays at 7pm', day: 'thursday', time: '7:00' },
+    { label: 'Fridays at 7pm', day: 'friday', time: '7:00' },
+    { label: 'Saturdays at 2pm', day: 'saturday', time: '2:00' },
+    { label: 'Saturdays at 7:30pm', day: 'saturday', time: '7:30' },
+  ];
+
+  // Sort performances by date, then by time
+  const sortedPerformances = performances.sort((a, b) => {
+    // First compare dates
+    const dateComparison = a.date.localeCompare(b.date);
+    if (dateComparison !== 0) {
+      return dateComparison;
+    }
+    // If same date, compare times
+    return a.time.localeCompare(b.time);
+  });
+
+  const filteredPerformances = sortedPerformances.filter(perf => {
+    if (!dateRange.from || !dateRange.to) return true;
+    
+    const perfDate = parseISO(perf.date);
+    return isWithinInterval(perfDate, {
+      start: dateRange.from,
+      end: dateRange.to,
+    });
+  });
+
+  // Also sort the filtered performances for display
+  const sortedFilteredPerformances = filteredPerformances.sort((a, b) => {
+    const dateComparison = a.date.localeCompare(b.date);
+    if (dateComparison !== 0) {
+      return dateComparison;
+    }
+    return a.time.localeCompare(b.time);
+  });
+
+  const addPerformance = (date, time) => {
+    const dateString = format(date, 'yyyy-MM-dd');
+    const exists = performances.find(p => 
+      p.date === dateString && p.time === time
+    );
+    
+    if (!exists) {
+      setPerformances(prev => {
+        const newPerformances = [...prev, { date: dateString, time }];
+        // Sort immediately when adding
+        return newPerformances.sort((a, b) => {
+          const dateComparison = a.date.localeCompare(b.date);
+          if (dateComparison !== 0) return dateComparison;
+          return a.time.localeCompare(b.time);
+        });
+      });
+    }
+  };
+
+  const removePerformance = (date, time) => {
+    setPerformances(prev => 
+      prev.filter(p => !(p.date === date && p.time === time))
+    );
+  };
+
+  const getPerformancesForDate = (date) => {
+    const dateString = format(date, 'yyyy-MM-dd');
+    return performances.filter(p => p.date === dateString).sort((a, b) => a.time.localeCompare(b.time));
+  };
+
+  // Bulk scheduling function
+  const scheduleByPattern = (day, time) => {
+    if (!dateRange.from || !dateRange.to) {
+      alert('Please set a date range first');
+      return;
+    }
+
+    const allDates = eachDayOfInterval({
+      start: dateRange.from,
+      end: dateRange.to,
+    });
+
+    const dayFunctions = {
+      sunday: isSunday,
+      monday: isMonday,
+      tuesday: isTuesday,
+      wednesday: isWednesday,
+      thursday: isThursday,
+      friday: isFriday,
+      saturday: isSaturday,
+    };
+
+    const dayFunction = dayFunctions[day];
+    const matchingDates = allDates.filter(date => dayFunction(date));
+
+    const newPerformances = matchingDates.map(date => ({
+      date: format(date, 'yyyy-MM-dd'),
+      time: time,
+    }));
+
+    // Filter out duplicates
+    const uniquePerformances = newPerformances.filter(newPerf => 
+      !performances.some(existingPerf => 
+        existingPerf.date === newPerf.date && existingPerf.time === newPerf.time
+      )
+    );
+
+    setPerformances(prev => {
+      const updated = [...prev, ...uniquePerformances];
+      // Sort after bulk adding
+      return updated.sort((a, b) => {
+        const dateComparison = a.date.localeCompare(b.date);
+        if (dateComparison !== 0) return dateComparison;
+        return a.time.localeCompare(b.time);
+      });
+    });
+    
+    alert(`Added ${uniquePerformances.length} performances for ${day}s at ${time}`);
+  };
+
+  // Clear all performances within date range
+  const clearPerformancesInRange = () => {
+    if (!dateRange.from || !dateRange.to) {
+      setPerformances([]);
+      return;
+    }
+
+    setPerformances(prev => 
+      prev.filter(perf => {
+        const perfDate = parseISO(perf.date);
+        return !isWithinInterval(perfDate, {
+          start: dateRange.from,
+          end: dateRange.to,
+        });
+      })
+    );
+  };
+
+  // Use sorted performances for JSON generation
+  const generateJSON = () => {
+    return JSON.stringify(sortedFilteredPerformances, null, 2);
+  };
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="container mx-auto p-8">
+      <h1 className="text-3xl font-bold mb-8">Performance Calendar</h1>
+      
+      {/* Date Range Picker */}
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle>Performance Date Range</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">Start Date</label>
+              <Calendar
+                mode="single"
+                selected={dateRange.from}
+                onSelect={(date) => setDateRange(prev => ({ ...prev, from: date }))}
+                className="rounded-md border"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-2 block">End Date</label>
+              <Calendar
+                mode="single"
+                selected={dateRange.to}
+                onSelect={(date) => setDateRange(prev => ({ ...prev, to: date }))}
+                className="rounded-md border"
+              />
+            </div>
+          </div>
+          {dateRange.from && dateRange.to && (
+            <p className="text-sm text-muted-foreground">
+              Date range: {format(dateRange.from, 'MMM d, yyyy')} to {format(dateRange.to, 'MMM d, yyyy')}
+            </p>
+          )}
+        </CardContent>
+      </Card>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+      {/* Bulk Scheduling */}
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle>Bulk Scheduling</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
+            {schedulingPatterns.map((pattern, index) => (
+              <Button
+                key={index}
+                onClick={() => scheduleByPattern(pattern.day, pattern.time)}
+                variant="outline"
+                className="h-auto py-3"
+                disabled={!dateRange.from || !dateRange.to}
+              >
+                <div className="text-left">
+                  <div className="font-medium">{pattern.label}</div>
+                </div>
+              </Button>
+            ))}
+          </div>
+          <div className="flex gap-2 mt-4">
+            <Button 
+              onClick={clearPerformancesInRange}
+              variant="destructive"
+            >
+              Clear Performances in Range
+            </Button>
+            <Button 
+              onClick={() => setPerformances([])}
+              variant="destructive"
+            >
+              Clear All Performances
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Performance Calendar */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Add Individual Performances</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Calendar
+              mode="single"
+              selected={selectedDate}
+              onSelect={setSelectedDate}
+              className="rounded-md border"
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          </CardContent>
+        </Card>
+
+        {/* Showtime Picker */}
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              {selectedDate ? `Performances for ${format(selectedDate, 'MMMM d, yyyy')}` : 'Select a Date'}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {selectedDate && (
+              <>
+                <div className="grid grid-cols-2 gap-2">
+                  {showtimes.map(time => (
+                    <Button
+                      key={time}
+                      onClick={() => addPerformance(selectedDate, time)}
+                      variant="outline"
+                    >
+                      {time}
+                    </Button>
+                  ))}
+                </div>
+
+                <div>
+                  <h4 className="font-medium mb-2">Current Performances:</h4>
+                  {getPerformancesForDate(selectedDate).map((perf, index) => (
+                    <div key={index} className="flex justify-between items-center py-2">
+                      <span>{perf.time}</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removePerformance(perf.date, perf.time)}
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Performance Summary */}
+      <Card className="mt-8">
+        <CardHeader>
+          <CardTitle>
+            Performance Summary ({sortedFilteredPerformances.length} in range) - Sorted by Date/Time
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 mb-4">
+            {sortedFilteredPerformances.map((perf, index) => (
+              <div key={index} className="bg-muted p-3 rounded-md text-sm">
+                <strong>{perf.date}</strong> at {perf.time}
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* JSON Output */}
+      <Card className="mt-8">
+        <CardHeader>
+          <CardTitle className="flex justify-between items-center">
+            Generated JSON (Sorted Chronologically)
+            <Button onClick={() => navigator.clipboard.writeText(generateJSON())}>
+              Copy JSON
+            </Button>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <pre className="bg-muted p-4 rounded-md overflow-auto text-sm">
+            {generateJSON()}
+          </pre>
+        </CardContent>
+      </Card>
     </div>
   );
 }
