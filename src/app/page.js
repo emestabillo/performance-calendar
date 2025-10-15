@@ -4,6 +4,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { format, isWithinInterval, parseISO, eachDayOfInterval, isSunday, isMonday, isTuesday, isWednesday, isThursday, isFriday, isSaturday } from 'date-fns';
+import DateRangePicker from '@/components/custom/DateRangePicker';
 
 export default function PerformanceCalendar() {
   const [selectedDate, setSelectedDate] = useState();
@@ -163,40 +164,7 @@ export default function PerformanceCalendar() {
   return (
     <div className="container mx-auto p-8">
       <h1 className="text-3xl font-bold mb-8">Performance Calendar</h1>
-      
-      {/* Date Range Picker */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>Performance Date Range</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm font-medium mb-2 block">Start Date</label>
-              <Calendar
-                mode="single"
-                selected={dateRange.from}
-                onSelect={(date) => setDateRange(prev => ({ ...prev, from: date }))}
-                className="rounded-md border"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium mb-2 block">End Date</label>
-              <Calendar
-                mode="single"
-                selected={dateRange.to}
-                onSelect={(date) => setDateRange(prev => ({ ...prev, to: date }))}
-                className="rounded-md border"
-              />
-            </div>
-          </div>
-          {dateRange.from && dateRange.to && (
-            <p className="text-sm text-muted-foreground">
-              Date range: {format(dateRange.from, 'MMM d, yyyy')} to {format(dateRange.to, 'MMM d, yyyy')}
-            </p>
-          )}
-        </CardContent>
-      </Card>
+      <DateRangePicker dateRange={dateRange} setDateRange={setDateRange} />
 
       {/* Bulk Scheduling */}
       <Card className="mb-8">
