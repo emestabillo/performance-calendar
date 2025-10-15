@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { format, isWithinInterval, parseISO, eachDayOfInterval, isSunday, isMonday, isTuesday, isWednesday, isThursday, isFriday, isSaturday } from 'date-fns';
 import DateRangePicker from '@/components/custom/DateRangePicker';
 import BulkScheduling from '@/components/custom/BulkScheduling';
+import JSONOutput from '@/components/custom/JSONOutput';
 
 export default function PerformanceCalendar() {
   const [selectedDate, setSelectedDate] = useState();
@@ -153,6 +154,7 @@ export default function PerformanceCalendar() {
   return (
     <div className="container mx-auto p-8">
       <h1 className="text-3xl font-bold mb-8">Performance Calendar</h1>
+
       <DateRangePicker dateRange={dateRange} setDateRange={setDateRange} />
 
       <BulkScheduling scheduleByPattern={scheduleByPattern} clearPerformancesInRange={clearPerformancesInRange} setPerformances={setPerformances} dateRange={dateRange} />
@@ -234,22 +236,7 @@ export default function PerformanceCalendar() {
         </CardContent>
       </Card>
 
-      {/* JSON Output */}
-      <Card className="mt-8">
-        <CardHeader>
-          <CardTitle className="flex justify-between items-center">
-            Generated JSON (Sorted Chronologically)
-            <Button onClick={() => navigator.clipboard.writeText(generateJSON())}>
-              Copy JSON
-            </Button>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <pre className="bg-muted p-4 rounded-md overflow-auto text-sm">
-            {generateJSON()}
-          </pre>
-        </CardContent>
-      </Card>
+      <JSONOutput generateJSON={generateJSON} />
     </div>
   );
 }
