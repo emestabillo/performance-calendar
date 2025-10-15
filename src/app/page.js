@@ -1,13 +1,11 @@
 'use client';
 import { useState } from 'react';
-import { Calendar } from '@/components/ui/calendar';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { format, isWithinInterval, parseISO, eachDayOfInterval, isSunday, isMonday, isTuesday, isWednesday, isThursday, isFriday, isSaturday } from 'date-fns';
+import { format, isWithinInterval, parseISO, eachDayOfInterval, isSunday, isMonday, isTuesday, isWednesday, isThursday, isFriday, isSaturday, add } from 'date-fns';
 import DateRangePicker from '@/components/custom/DateRangePicker';
 import BulkScheduling from '@/components/custom/BulkScheduling';
 import JSONOutput from '@/components/custom/JSONOutput';
 import PerformanceSummary from '@/components/custom/PerformanceSummary';
+import AddIndividualShows from '@/components/custom/AddIndividualShows';
 
 export default function PerformanceCalendar() {
   const [selectedDate, setSelectedDate] = useState();
@@ -160,64 +158,7 @@ export default function PerformanceCalendar() {
 
       <BulkScheduling scheduleByPattern={scheduleByPattern} clearPerformancesInRange={clearPerformancesInRange} setPerformances={setPerformances} dateRange={dateRange} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Performance Calendar */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Add Individual Performances</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Calendar
-              mode="single"
-              selected={selectedDate}
-              onSelect={setSelectedDate}
-              className="rounded-md border"
-            />
-          </CardContent>
-        </Card>
-
-        {/* Showtime Picker */}
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              {selectedDate ? `Performances for ${format(selectedDate, 'MMMM d, yyyy')}` : 'Select a Date'}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {selectedDate && (
-              <>
-                <div className="grid grid-cols-2 gap-2">
-                  {showtimes.map(time => (
-                    <Button
-                      key={time}
-                      onClick={() => addPerformance(selectedDate, time)}
-                      variant="outline"
-                    >
-                      {time}
-                    </Button>
-                  ))}
-                </div>
-
-                <div>
-                  <h4 className="font-medium mb-2">Current Performances:</h4>
-                  {getPerformancesForDate(selectedDate).map((perf, index) => (
-                    <div key={index} className="flex justify-between items-center py-2">
-                      <span>{perf.time}</span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removePerformance(perf.date, perf.time)}
-                      >
-                        Remove
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+      <AddIndividualShows addPerformance={addPerformance} removePerformance={removePerformance} getPerformancesForDate={getPerformancesForDate} selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
 
       <PerformanceSummary sortedFilteredPerformances={sortedFilteredPerformances} />
 
