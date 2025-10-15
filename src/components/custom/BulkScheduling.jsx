@@ -36,12 +36,12 @@ export default function BulkScheduling({scheduleByPattern, clearPerformancesInRa
             ))}
           </div>
           <div className="flex gap-2 mt-4">
-            <Button 
+            {/* <Button 
               onClick={clearPerformancesInRange}
               variant="destructive"
             >
               Clear Performances in Range
-            </Button>
+            </Button> */}
             <Button 
               onClick={() => setPerformances([])}
               variant="destructive"
