@@ -7,6 +7,7 @@ import { format, isWithinInterval, parseISO, eachDayOfInterval, isSunday, isMond
 import DateRangePicker from '@/components/custom/DateRangePicker';
 import BulkScheduling from '@/components/custom/BulkScheduling';
 import JSONOutput from '@/components/custom/JSONOutput';
+import PerformanceSummary from '@/components/custom/PerformanceSummary';
 
 export default function PerformanceCalendar() {
   const [selectedDate, setSelectedDate] = useState();
@@ -218,23 +219,7 @@ export default function PerformanceCalendar() {
         </Card>
       </div>
 
-      {/* Performance Summary */}
-      <Card className="mt-8">
-        <CardHeader>
-          <CardTitle>
-            Performance Summary ({sortedFilteredPerformances.length} in range) - Sorted by Date/Time
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 mb-4">
-            {sortedFilteredPerformances.map((perf, index) => (
-              <div key={index} className="bg-muted p-3 rounded-md text-sm">
-                <strong>{perf.date}</strong> at {perf.time}
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <PerformanceSummary sortedFilteredPerformances={sortedFilteredPerformances} />
 
       <JSONOutput generateJSON={generateJSON} />
     </div>
