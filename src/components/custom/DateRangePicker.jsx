@@ -1,34 +1,72 @@
+import React from 'react'
 import { Calendar } from '@/components/ui/calendar'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { format } from 'date-fns'
+import { Calendar as CalendarIcon } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 
-export default function DateRangePicker({ dateRange, setDateRange }) {
+export default function DateRangePicker({ dateRange, setDateRange, setFirstShowDate, setLastShowDate, openFirstShowDateCalendar, setOpenFirstShowDateCalendar, openLastShowDateCalendar, setOpenLastShowDateCalendar }) {
   return (
     <>
-      {/* Date Range Picker */}
       <Card className="mb-8">
         <CardHeader>
           <CardTitle>Performance Date Range</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex flex-wrap gap-4">
             <div>
               <label className="text-sm font-medium mb-2 block">Start Date</label>
-              <Calendar
-                mode="single"
-                selected={dateRange.from}
-                onSelect={(date) => setDateRange(prev => ({ ...prev, from: date }))}
-                className="rounded-md border"
-              />
+              <Popover open={openFirstShowDateCalendar} onOpenChange={setOpenFirstShowDateCalendar}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    data-empty={!dateRange.from}
+                    className="data-[empty=true]:text-muted-foreground w-[280px] justify-start text-left font-normal"
+                  >
+                    <CalendarIcon />
+                    {dateRange.from ? format(dateRange.from, "PPP") : <span>Pick start date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar mode="single"
+                    selected={dateRange.from}
+                    onSelect={(date) => {
+                      setDateRange(prev => ({ ...prev, from: date }))
+                      setFirstShowDate(date)
+                      setOpenFirstShowDateCalendar(false)
+                    }} />
+                </PopoverContent>
+              </Popover>
             </div>
+          
             <div>
               <label className="text-sm font-medium mb-2 block">End Date</label>
-              <Calendar
-                mode="single"
-                selected={dateRange.to}
-                onSelect={(date) => setDateRange(prev => ({ ...prev, to: date }))}
-                className="rounded-md border"
-              />
+              <Popover open={openLastShowDateCalendar} onOpenChange={setOpenLastShowDateCalendar}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    data-empty={!dateRange.to}
+                    className="data-[empty=true]:text-muted-foreground w-[280px] justify-start text-left font-normal"
+                  >
+                    <CalendarIcon />
+                    {dateRange.to ? format(dateRange.to, "PPP") : <span>Pick end date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar mode="single"
+                    selected={dateRange.to}
+                    onSelect={(date) => {
+                      setDateRange(prev => ({ ...prev, to: date }))
+                      setLastShowDate(date)
+                      setOpenLastShowDateCalendar(false)
+                    }} />
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
           {dateRange.from && dateRange.to && (

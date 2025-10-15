@@ -14,6 +14,10 @@ export default function PerformanceCalendar() {
     from: undefined,
     to: undefined,
   });
+  const [firstShowDate, setFirstShowDate] = useState()
+  const [lastShowDate, setLastShowDate] = useState()
+  const [openFirstShowDateCalendar, setOpenFirstShowDateCalendar] = useState(false)
+  const [openLastShowDateCalendar, setOpenLastShowDateCalendar] = useState(false)
 
   const showtimes = ['2:00', '3:00', '7:00', '7:30', '8:00'];
 
@@ -153,7 +157,7 @@ export default function PerformanceCalendar() {
     <div className="container mx-auto p-8">
       <h1 className="text-3xl font-bold mb-8">Performance Calendar</h1>
 
-      <DateRangePicker dateRange={dateRange} setDateRange={setDateRange} />
+      <DateRangePicker dateRange={dateRange} setDateRange={setDateRange} setFirstShowDate={setFirstShowDate} setLastShowDate={setLastShowDate} setOpenFirstShowDateCalendar={setOpenFirstShowDateCalendar} setOpenLastShowDateCalendar={setOpenLastShowDateCalendar} openLastShowDateCalendar={openLastShowDateCalendar} openFirstShowDateCalendar={openFirstShowDateCalendar}/>
 
       <BulkScheduling scheduleByPattern={scheduleByPattern} clearPerformancesInRange={clearPerformancesInRange} setPerformances={setPerformances} dateRange={dateRange} />
 
