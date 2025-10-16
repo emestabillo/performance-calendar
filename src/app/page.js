@@ -5,6 +5,7 @@ import DateRangePicker from '@/components/custom/DateRangePicker';
 import BulkScheduling from '@/components/custom/BulkScheduling';
 import JSONOutput from '@/components/custom/JSONOutput';
 import PerformanceSummary from '@/components/custom/PerformanceSummary';
+import { toast } from "sonner"
 // import AddIndividualShows from '@/components/custom/AddIndividualShows';
 
 export default function PerformanceCalendar() {
@@ -100,6 +101,8 @@ export default function PerformanceCalendar() {
       saturday: isSaturday,
     };
 
+    const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+
     const dayFunction = dayFunctions[day];
     const matchingDates = allDates.filter(date => dayFunction(date));
 
@@ -125,7 +128,7 @@ export default function PerformanceCalendar() {
       });
     });
     
-    alert(`Added ${uniquePerformances.length} performances for ${day}s at ${time}`);
+    toast.success(`Added ${uniquePerformances.length} performances for ${capitalize(day)}s at ${time}`);
   };
 
   // Clear all performances within date range
