@@ -14,43 +14,41 @@ export default function BulkScheduling({scheduleByPattern, clearPerformancesInRa
   ];
 
   return (
-    <>
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle><h2>Bulk Scheduling</h2></CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
-            {schedulingPatterns.map((pattern, index) => (
-              <Button
-                key={index}
-                onClick={() => scheduleByPattern(pattern.day, pattern.time)}
-                variant="outline"
-                className="h-auto py-3"
-                disabled={!dateRange.from || !dateRange.to}
-              >
-                <div className="text-left">
-                  <div className="font-medium">{pattern.label}</div>
-                </div>
-              </Button>
-            ))}
-          </div>
-          <div className="flex gap-2 mt-4">
-            {/* <Button 
-              onClick={clearPerformancesInRange}
-              variant="destructive"
+    <Card className="mb-8">
+      <CardHeader>
+        <CardTitle><h2>Bulk Scheduling</h2></CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
+          {schedulingPatterns.map((pattern, index) => (
+            <Button
+              key={index}
+              onClick={() => scheduleByPattern(pattern.day, pattern.time)}
+              variant="outline"
+              className="h-auto py-3"
+              disabled={!dateRange.from || !dateRange.to}
             >
-              Clear Performances in Range
-            </Button> */}
-            <Button 
-              onClick={() => setPerformances([])}
-              variant="destructive"
-            >
-              Clear All Performances
+              <div className="text-left">
+                <div className="font-medium">{pattern.label}</div>
+              </div>
             </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </>
+          ))}
+        </div>
+        <div className="flex gap-2 mt-4">
+          {/* <Button 
+            onClick={clearPerformancesInRange}
+            variant="destructive"
+          >
+            Clear Performances in Range
+          </Button> */}
+          <Button 
+            onClick={() => setPerformances([])}
+            variant="destructive"
+          >
+            Clear All Performances
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   )
 }
