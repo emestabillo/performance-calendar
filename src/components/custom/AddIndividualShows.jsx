@@ -10,7 +10,7 @@ export default function AddIndividualShows({addPerformance, removePerformance, g
         {/* Performance Calendar */}
         <Card>
           <CardHeader>
-            <CardTitle>Add Individual Performances</CardTitle>
+            <CardTitle><h2>Add Individual Performances</h2></CardTitle>
           </CardHeader>
           <CardContent>
             <Calendar

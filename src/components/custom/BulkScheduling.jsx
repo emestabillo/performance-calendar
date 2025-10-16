@@ -17,7 +17,7 @@ export default function BulkScheduling({scheduleByPattern, clearPerformancesInRa
     <>
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle>Bulk Scheduling</CardTitle>
+          <CardTitle><h2>Bulk Scheduling</h2></CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">

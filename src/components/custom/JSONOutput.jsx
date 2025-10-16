@@ -7,7 +7,7 @@ export default function JSONOutput({generateJSON}) {
       <Card className="mt-8">
         <CardHeader>
           <CardTitle className="flex justify-between items-center">
-            Generated JSON (Sorted Chronologically)
+            <h2>Generated JSON (Sorted Chronologically)</h2>
             <Button className="bg-foreground" onClick={() => navigator.clipboard.writeText(generateJSON())}>
               Copy JSON
             </Button>

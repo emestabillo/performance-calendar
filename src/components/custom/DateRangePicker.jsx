@@ -15,7 +15,7 @@ export default function DateRangePicker({ dateRange, setDateRange, setFirstShowD
     <>
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle>Performance Date Range</CardTitle>
+          <CardTitle><h2>Performance Date Range</h2></CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex flex-wrap gap-4">

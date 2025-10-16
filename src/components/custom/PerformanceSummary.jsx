@@ -6,7 +6,7 @@ export default function PerformanceSummary({sortedFilteredPerformances}) {
       <Card className="mt-8">
         <CardHeader>
           <CardTitle>
-            Performance Summary ({sortedFilteredPerformances.length} in range) - Sorted by Date/Time
+            <h2>Performance Summary ({sortedFilteredPerformances.length} in range) - Sorted by Date/Time</h2>
           </CardTitle>
         </CardHeader>
         <CardContent>
