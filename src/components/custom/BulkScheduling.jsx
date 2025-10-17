@@ -20,19 +20,23 @@ export default function BulkScheduling({scheduleByPattern, clearPerformancesInRa
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
-          {schedulingPatterns.map((pattern, index) => (
-            <Button
-              key={index}
-              onClick={() => scheduleByPattern(pattern.day, pattern.time)}
-              variant="outline"
-              className="h-auto py-3"
-              disabled={!dateRange.from || !dateRange.to}
-            >
-              <div className="text-left">
-                <div className="font-medium">{pattern.label}</div>
-              </div>
-            </Button>
-          ))}
+          {schedulingPatterns.map((pattern, index) => {
+            const {day, time, label} = pattern 
+              return (
+                <Button
+                  key={index}
+                  onClick={() => scheduleByPattern(day, time)}
+                  variant="outline"
+                  className="h-auto py-3"
+                  disabled={!dateRange.from || !dateRange.to}
+                >
+                  <div className="text-left">
+                    <div className="font-medium">{label}</div>
+                  </div>
+                </Button>
+              )
+            })
+          }
         </div>
         <div className="flex gap-2 mt-4">
           {/* <Button 

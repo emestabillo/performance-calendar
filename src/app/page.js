@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { format, isWithinInterval, parseISO, eachDayOfInterval, isSunday, isMonday, isTuesday, isWednesday, isThursday, isFriday, isSaturday, add } from 'date-fns';
-import DateRangePicker from '@/components/custom/DateRangePicker';
+import RangePicker from '@/components/custom/RangePicker';
 import BulkScheduling from '@/components/custom/BulkScheduling';
 import JSONOutput from '@/components/custom/JSONOutput';
 import PerformanceSummary from '@/components/custom/PerformanceSummary';
@@ -20,34 +20,34 @@ export default function PerformanceCalendar() {
 
   const showtimes = ['2:00', '3:00', '7:00', '7:30', '8:00'];
 
-  // Sort performances by date, then by time
-  const sortedPerformances = performances.sort((a, b) => {
-    const dateComparison = a.date.localeCompare(b.date);
-    if (dateComparison !== 0) {
-      return dateComparison;
-    }
-    // If same date, compare times
-    return a.time.localeCompare(b.time);
-  });
-
-  const filteredPerformances = sortedPerformances.filter(perf => {
-    if (!dateRange.from || !dateRange.to) return true;
-    
-    const perfDate = parseISO(perf.date);
-    return isWithinInterval(perfDate, {
-      start: dateRange.from,
-      end: dateRange.to,
+  // Reusable sort function
+  const sortDates = (performances) => {
+    return performances.sort((a, b) => {
+      const dateComparison = a.date.localeCompare(b.date);
+      if (dateComparison !== 0) {
+        return dateComparison;
+      }
+      // If same date, compare times
+      return a.time.localeCompare(b.time);
     });
-  });
+  };
 
-  // Also sort the filtered performances for display
-  const sortedFilteredPerformances = filteredPerformances.sort((a, b) => {
-    const dateComparison = a.date.localeCompare(b.date);
-    if (dateComparison !== 0) {
-      return dateComparison;
-    }
-    return a.time.localeCompare(b.time);
-  });
+  // Reusable filter function
+  const filterPerformances = (performances, dateRange) => {
+    return performances.filter(perf => {
+      if (!dateRange.from || !dateRange.to) return true;
+      
+      const perfDate = parseISO(perf.date);
+      return isWithinInterval(perfDate, {
+        start: dateRange.from,
+        end: dateRange.to,
+      });
+    });
+  };
+
+  // Apply filter and sort
+  const filteredShows = filterPerformances(performances, dateRange);
+  const sortedFilteredShows = sortDates(filteredShows);
 
   const addPerformance = (date, time) => {
     const dateString = format(date, 'yyyy-MM-dd');
@@ -59,11 +59,7 @@ export default function PerformanceCalendar() {
       setPerformances(prev => {
         const newPerformances = [...prev, { date: dateString, time }];
         // Sort immediately when adding
-        return newPerformances.sort((a, b) => {
-          const dateComparison = a.date.localeCompare(b.date);
-          if (dateComparison !== 0) return dateComparison;
-          return a.time.localeCompare(b.time);
-        });
+        return sortDates(newPerformances);
       });
     }
   };
@@ -81,11 +77,6 @@ export default function PerformanceCalendar() {
 
   // Bulk scheduling function
   const scheduleByPattern = (day, time) => {
-    if (!dateRange.from || !dateRange.to) {
-      alert('Please set a date range first');
-      return;
-    }
-
     const allDates = eachDayOfInterval({
       start: dateRange.from,
       end: dateRange.to,
@@ -100,8 +91,6 @@ export default function PerformanceCalendar() {
       friday: isFriday,
       saturday: isSaturday,
     };
-
-    const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 
     const dayFunction = dayFunctions[day];
     const matchingDates = allDates.filter(date => dayFunction(date));
@@ -121,50 +110,35 @@ export default function PerformanceCalendar() {
     setPerformances(prev => {
       const updated = [...prev, ...uniquePerformances];
       // Sort after bulk adding
-      return updated.sort((a, b) => {
-        const dateComparison = a.date.localeCompare(b.date);
-        if (dateComparison !== 0) return dateComparison;
-        return a.time.localeCompare(b.time);
-      });
+      return sortDates(updated);
     });
+
+    const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
     
     toast.success(`Added ${uniquePerformances.length} performances for ${capitalize(day)}s at ${time}`);
   };
 
   // Clear all performances within date range
   const clearPerformancesInRange = () => {
-    if (!dateRange.from || !dateRange.to) {
-      setPerformances([]);
-      return;
-    }
-
-    setPerformances(prev => 
-      prev.filter(perf => {
-        const perfDate = parseISO(perf.date);
-        return !isWithinInterval(perfDate, {
-          start: dateRange.from,
-          end: dateRange.to,
-        });
-      })
-    );
+    setPerformances([]);
   };
 
   // Use sorted performances for JSON generation
   const generateJSON = () => {
-    return JSON.stringify(sortedFilteredPerformances, null, 2);
+    return JSON.stringify(sortedFilteredShows, null, 2);
   };
 
   return (
     <div className="container mx-auto p-8">
       <h1 className="text-3xl font-bold mb-8">Performance Calendar</h1>
 
-      <DateRangePicker dateRange={dateRange} setDateRange={setDateRange} setFirstShowDate={setFirstShowDate} setLastShowDate={setLastShowDate} />
+      <RangePicker dateRange={dateRange} setDateRange={setDateRange} setFirstShowDate={setFirstShowDate} setLastShowDate={setLastShowDate} />
 
       <BulkScheduling scheduleByPattern={scheduleByPattern} clearPerformancesInRange={clearPerformancesInRange} setPerformances={setPerformances} dateRange={dateRange} />
 
       {/* <AddIndividualShows addPerformance={addPerformance} removePerformance={removePerformance} getPerformancesForDate={getPerformancesForDate} selectedDate={selectedDate} setSelectedDate={setSelectedDate} /> */}
 
-      <PerformanceSummary sortedFilteredPerformances={sortedFilteredPerformances} />
+      <PerformanceSummary sortedFilteredPerformances={sortedFilteredShows} />
 
       <JSONOutput generateJSON={generateJSON} />
     </div>

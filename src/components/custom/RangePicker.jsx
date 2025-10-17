@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { format } from 'date-fns'
 import DateDropdown from './DateDropdown'
 
-export default function DateRangePicker({ dateRange, setDateRange, setFirstShowDate, setLastShowDate }) {
+export default function RangePicker({ dateRange, setDateRange, setFirstShowDate, setLastShowDate }) {
   return (
     <Card className="mb-8">
       <CardHeader>
