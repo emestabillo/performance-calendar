@@ -173,7 +173,6 @@ export default function PerformanceCalendar() {
 
       <BulkScheduling
         scheduleByPattern={scheduleByPattern}
-        clearPerformancesInRange={clearPerformancesInRange}
         setPerformances={setPerformances}
         dateRange={dateRange}
         isRangeValid={isRangeValid}
