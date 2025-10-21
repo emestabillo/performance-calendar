@@ -1,11 +1,24 @@
-'use client';
-import { useState } from 'react';
-import { format, isWithinInterval, parseISO, eachDayOfInterval, isSunday, isMonday, isTuesday, isWednesday, isThursday, isFriday, isSaturday, add } from 'date-fns';
-import RangePicker from '@/components/custom/RangePicker';
-import BulkScheduling from '@/components/custom/BulkScheduling';
-import JSONOutput from '@/components/custom/JSONOutput';
-import PerformanceSummary from '@/components/custom/PerformanceSummary';
-import { toast } from "sonner"
+"use client";
+import { useState } from "react";
+import {
+  format,
+  isWithinInterval,
+  parseISO,
+  eachDayOfInterval,
+  isSunday,
+  isMonday,
+  isTuesday,
+  isWednesday,
+  isThursday,
+  isFriday,
+  isSaturday,
+  add,
+} from "date-fns";
+import RangePicker from "@/components/custom/RangePicker";
+import BulkScheduling from "@/components/custom/BulkScheduling";
+import JSONOutput from "@/components/custom/JSONOutput";
+import PerformanceSummary from "@/components/custom/PerformanceSummary";
+import { toast } from "sonner";
 // import AddIndividualShows from '@/components/custom/AddIndividualShows';
 
 export default function PerformanceCalendar() {
@@ -15,10 +28,10 @@ export default function PerformanceCalendar() {
     from: undefined,
     to: undefined,
   });
-  const [firstShowDate, setFirstShowDate] = useState()
-  const [lastShowDate, setLastShowDate] = useState()
+  const [firstShowDate, setFirstShowDate] = useState();
+  const [lastShowDate, setLastShowDate] = useState();
 
-  const showtimes = ['2:00', '3:00', '7:00', '7:30', '8:00'];
+  const showtimes = ["2:00", "3:00", "7:00", "7:30", "8:00"];
 
   // Reusable sort function
   const sortDates = (performances) => {
@@ -34,9 +47,9 @@ export default function PerformanceCalendar() {
 
   // Reusable filter function
   const filterPerformances = (performances, dateRange) => {
-    return performances.filter(perf => {
+    return performances.filter((perf) => {
       if (!dateRange.from || !dateRange.to) return true;
-      
+
       const perfDate = parseISO(perf.date);
       return isWithinInterval(perfDate, {
         start: dateRange.from,
@@ -50,29 +63,34 @@ export default function PerformanceCalendar() {
   const sortedFilteredShows = sortDates(filteredShows);
 
   const addPerformance = (date, time) => {
-    const dateString = format(date, 'yyyy-MM-dd');
-    const exists = performances.find(p => 
-      p.date === dateString && p.time === time
+    const dateString = format(date, "yyyy-MM-dd");
+    const exists = performances.find(
+      (p) => p.date === dateString && p.time === time
     );
-    
+
     if (!exists) {
-      setPerformances(prev => {
+      setPerformances((prev) => {
         const newPerformances = [...prev, { date: dateString, time }];
-        // Sort immediately when adding
         return sortDates(newPerformances);
       });
     }
   };
 
+  // Consider the range valid only if both dates are present and from <= to
+  const isRangeValid =
+    !!dateRange.from && !!dateRange.to && dateRange.from <= dateRange.to;
+
   const removePerformance = (date, time) => {
-    setPerformances(prev => 
-      prev.filter(p => !(p.date === date && p.time === time))
+    setPerformances((prev) =>
+      prev.filter((p) => !(p.date === date && p.time === time))
     );
   };
 
   const getPerformancesForDate = (date) => {
-    const dateString = format(date, 'yyyy-MM-dd');
-    return performances.filter(p => p.date === dateString).sort((a, b) => a.time.localeCompare(b.time));
+    const dateString = format(date, "yyyy-MM-dd");
+    return performances
+      .filter((p) => p.date === dateString)
+      .sort((a, b) => a.time.localeCompare(b.time));
   };
 
   // Bulk scheduling function
@@ -93,29 +111,36 @@ export default function PerformanceCalendar() {
     };
 
     const dayFunction = dayFunctions[day];
-    const matchingDates = allDates.filter(date => dayFunction(date));
+    const matchingDates = allDates.filter((date) => dayFunction(date));
 
-    const newPerformances = matchingDates.map(date => ({
-      date: format(date, 'yyyy-MM-dd'),
+    const newPerformances = matchingDates.map((date) => ({
+      date: format(date, "yyyy-MM-dd"),
       time: time,
     }));
 
     // Filter out duplicates
-    const uniquePerformances = newPerformances.filter(newPerf => 
-      !performances.some(existingPerf => 
-        existingPerf.date === newPerf.date && existingPerf.time === newPerf.time
-      )
+    const uniquePerformances = newPerformances.filter(
+      (newPerf) =>
+        !performances.some(
+          (existingPerf) =>
+            existingPerf.date === newPerf.date &&
+            existingPerf.time === newPerf.time
+        )
     );
 
-    setPerformances(prev => {
+    setPerformances((prev) => {
       const updated = [...prev, ...uniquePerformances];
       // Sort after bulk adding
       return sortDates(updated);
     });
 
     const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
-    
-    toast.success(`Added ${uniquePerformances.length} performances for ${capitalize(day)}s at ${time}`);
+
+    toast.success(
+      `Added ${uniquePerformances.length} performances for ${capitalize(
+        day
+      )}s at ${time}`
+    );
   };
 
   // Clear all performances within date range
@@ -132,9 +157,21 @@ export default function PerformanceCalendar() {
     <div className="container mx-auto p-8">
       <h1 className="text-3xl font-bold mb-8">Performance Calendar</h1>
 
-      <RangePicker dateRange={dateRange} setDateRange={setDateRange} setFirstShowDate={setFirstShowDate} setLastShowDate={setLastShowDate} />
+      <RangePicker
+        dateRange={dateRange}
+        setDateRange={setDateRange}
+        setFirstShowDate={setFirstShowDate}
+        setLastShowDate={setLastShowDate}
+        isRangeValid={isRangeValid}
+      />
 
-      <BulkScheduling scheduleByPattern={scheduleByPattern} clearPerformancesInRange={clearPerformancesInRange} setPerformances={setPerformances} dateRange={dateRange} />
+      <BulkScheduling
+        scheduleByPattern={scheduleByPattern}
+        clearPerformancesInRange={clearPerformancesInRange}
+        setPerformances={setPerformances}
+        dateRange={dateRange}
+        isRangeValid={isRangeValid}
+      />
 
       {/* <AddIndividualShows addPerformance={addPerformance} removePerformance={removePerformance} getPerformancesForDate={getPerformancesForDate} selectedDate={selectedDate} setSelectedDate={setSelectedDate} /> */}
 
