@@ -130,7 +130,6 @@ export default function PerformanceCalendar() {
 
     setPerformances((prev) => {
       const updated = [...prev, ...uniquePerformances];
-      // Sort after bulk adding
       return sortDates(updated);
     });
 
@@ -155,8 +154,15 @@ export default function PerformanceCalendar() {
 
   return (
     <div className="container mx-auto p-8">
-      <h1 className="text-3xl font-bold mb-8">Performance Calendar</h1>
-
+      <header className="mb-8">
+        <h1 className="text-3xl font-bold">Performance Calendar</h1>
+        <p className="mb-2 text-lg">
+          Generate API-ready JSON of recurring performance dates in seconds.
+        </p>
+        <p className="text-sm text-muted-foreground">
+          Choose a date range → pick days & times → copy JSON.
+        </p>
+      </header>
       <RangePicker
         dateRange={dateRange}
         setDateRange={setDateRange}
