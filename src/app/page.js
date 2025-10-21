@@ -183,7 +183,7 @@ export default function PerformanceCalendar() {
 
       <PerformanceSummary sortedFilteredPerformances={sortedFilteredShows} />
 
-      <JSONOutput generateJSON={generateJSON} />
+      <JSONOutput generateJSON={generateJSON} isRangeValid={isRangeValid} />
     </div>
   );
 }
