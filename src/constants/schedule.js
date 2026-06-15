@@ -6,7 +6,7 @@ export const SCHEDULING_PATTERNS = [
   { label: "Wednesdays at 2pm", day: "wednesday", time: "2:00" },
   { label: "Wednesdays at 7:30pm", day: "wednesday", time: "7:30" },
   { label: "Wednesdays at 8:00pm", day: "wednesday", time: "8:00" },
-  { label: "Thursdays at 1:00pm", day: "thursday", time: "1:00" },
+  { label: "Thursdays at 1pm", day: "thursday", time: "1:00" },
   { label: "Thursdays at 7pm", day: "thursday", time: "7:00" },
   { label: "Thursdays at 7:30pm", day: "thursday", time: "7:30" },
   { label: "Thursdays at 8:00pm", day: "thursday", time: "8:00" },
